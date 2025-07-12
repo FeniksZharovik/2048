@@ -74,12 +74,13 @@ function move(direction) {
   }
 
   if (moved) {
-    addNewTile();
-    updateScore();
-  }
+  addNewTile();
+  updateScore();
+  checkGameOver(); // Tambahkan ini
 }
-
+}
 function restartGame() {
+  document.getElementById('game-over-modal').classList.add('hidden');
   setupBoard();
 }
 
@@ -110,5 +111,44 @@ document.addEventListener('touchend', e => {
     else if (dy < -30) move('up');
   }
 });
+
+// Cegah refresh di area game-board saat swipe bawah
+const gameBoard = document.getElementById('game-board');
+let touchInsideGame = false;
+
+gameBoard.addEventListener('touchstart', (e) => {
+  touchInsideGame = true;
+}, { passive: false });
+
+gameBoard.addEventListener('touchmove', (e) => {
+  if (touchInsideGame) {
+    e.preventDefault(); // Cegah scroll/refresh hanya jika swipe di dalam papan
+  }
+}, { passive: false });
+
+gameBoard.addEventListener('touchend', () => {
+  touchInsideGame = false;
+});
+
+function checkGameOver() {
+  // Jika masih ada tile kosong, belum game over
+  if (tiles.some(tile => tile.textContent === '')) return;
+
+  // Cek semua arah, jika masih bisa merge maka belum game over
+  for (let y = 0; y < 4; y++) {
+    for (let x = 0; x < 4; x++) {
+      let current = getTile(x, y).textContent;
+
+      // Cek kanan
+      if (x < 3 && current === getTile(x + 1, y).textContent) return;
+      // Cek bawah
+      if (y < 3 && current === getTile(x, y + 1).textContent) return;
+    }
+  }
+
+  // Game over
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('game-over-modal').classList.remove('hidden');
+}
 
 window.onload = setupBoard;
