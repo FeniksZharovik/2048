@@ -1,73 +1,114 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #faf8ef;
-  text-align: center;
-  margin: 0;
-  padding: 20px;
+const board = document.getElementById('game-board');
+const scoreDisplay = document.getElementById('score');
+let tiles = [];
+let score = 0;
+
+function setupBoard() {
+  board.innerHTML = '';
+  tiles = [];
+  for (let i = 0; i < 16; i++) {
+    let tile = document.createElement('div');
+    tile.classList.add('tile');
+    tile.textContent = '';
+    tile.dataset.value = '';
+    tiles.push(tile);
+    board.appendChild(tile);
+  }
+  score = 0;
+  updateScore();
+  addNewTile();
+  addNewTile();
 }
 
-h1 {
-  color: #776e65;
-  font-size: 48px;
-  margin-bottom: 10px;
+function updateScore() {
+  scoreDisplay.textContent = score;
 }
 
-.score-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 15px;
+function addNewTile() {
+  let emptyTiles = tiles.filter(t => t.textContent === '');
+  if (emptyTiles.length === 0) return;
+  let rand = Math.floor(Math.random() * emptyTiles.length);
+  let value = Math.random() < 0.9 ? 2 : 4;
+  emptyTiles[rand].textContent = value;
+  emptyTiles[rand].dataset.value = value;
 }
 
-button {
-  padding: 8px 15px;
-  background-color: #8f7a66;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
+function getTile(x, y) {
+  return tiles[y * 4 + x];
 }
 
-#game-board {
-  display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-gap: 10px;
-  background-color: #bbada0;
-  padding: 10px;
-  margin: 0 auto;
-  border-radius: 10px;
-  width: max-content;
+function slide(row) {
+  let newRow = row.filter(n => n !== '');
+  for (let i = 0; i < newRow.length - 1; i++) {
+    if (newRow[i] === newRow[i + 1]) {
+      newRow[i] *= 2;
+      score += newRow[i];
+      newRow[i + 1] = '';
+    }
+  }
+  return newRow.filter(n => n !== '').concat(Array(4 - newRow.filter(n => n !== '').length).fill(''));
 }
 
-.tile {
-  width: 80px;
-  height: 80px;
-  background: #cdc1b4;
-  font-size: 28px;
-  line-height: 80px;
-  border-radius: 5px;
-  font-weight: bold;
-  color: #776e65;
-  transition: all 0.2s;
+function move(direction) {
+  let moved = false;
+  for (let y = 0; y < 4; y++) {
+    let row = [];
+    for (let x = 0; x < 4; x++) {
+      let tile = getTile(x, y);
+      row.push(direction === 'left' || direction === 'right' ? tile.textContent : getTile(y, x).textContent);
+    }
+
+    if (direction === 'right' || direction === 'down') row.reverse();
+
+    let newRow = slide(row);
+
+    if (direction === 'right' || direction === 'down') newRow.reverse();
+
+    for (let x = 0; x < 4; x++) {
+      let idx = direction === 'left' || direction === 'right' ? y * 4 + x : x * 4 + y;
+      let old = tiles[idx].textContent;
+      if (tiles[idx].textContent !== newRow[x]) moved = true;
+      tiles[idx].textContent = newRow[x] === '' ? '' : newRow[x];
+      tiles[idx].dataset.value = newRow[x] === '' ? '' : newRow[x];
+    }
+  }
+
+  if (moved) {
+    addNewTile();
+    updateScore();
+  }
 }
 
-.tile[data-value="2"]    { background: #eee4da; }
-.tile[data-value="4"]    { background: #ede0c8; }
-.tile[data-value="8"]    { background: #f2b179; color: #f9f6f2; }
-.tile[data-value="16"]   { background: #f59563; color: #f9f6f2; }
-.tile[data-value="32"]   { background: #f67c5f; color: #f9f6f2; }
-.tile[data-value="64"]   { background: #f65e3b; color: #f9f6f2; }
-.tile[data-value="128"]  { background: #edcf72; color: #f9f6f2; }
-.tile[data-value="256"]  { background: #edcc61; color: #f9f6f2; }
-.tile[data-value="512"]  { background: #edc850; color: #f9f6f2; }
-.tile[data-value="1024"] { background: #edc53f; color: #f9f6f2; }
-.tile[data-value="2048"] { background: #edc22e; color: #f9f6f2; }
-
-.footer {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #999;
+function restartGame() {
+  setupBoard();
 }
-  
+
+document.addEventListener('keydown', e => {
+  switch (e.key) {
+    case 'ArrowLeft': move('left'); break;
+    case 'ArrowRight': move('right'); break;
+    case 'ArrowUp': move('up'); break;
+    case 'ArrowDown': move('down'); break;
+  }
+});
+
+// Swipe support untuk HP
+let touchStartX = 0;
+let touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+});
+document.addEventListener('touchend', e => {
+  let dx = e.changedTouches[0].clientX - touchStartX;
+  let dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 30) move('right');
+    else if (dx < -30) move('left');
+  } else {
+    if (dy > 30) move('down');
+    else if (dy < -30) move('up');
+  }
+});
+
+window.onload = setupBoard;
