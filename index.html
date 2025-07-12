@@ -3,18 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>2048</title>
+  <title>2048 Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>2048</h1>
-  <div class="score-box">
-    <div>Score: <span id="score">0</span></div>
-    <button onclick="restartGame()">🔁 Restart</button>
+  <div class="container">
+    <h1>2048</h1>
+    <div class="score-box">
+      <div>Score: <span id="score">0</span></div>
+      <button onclick="restartGame()">🔁 Restart</button>
+    </div>
+    <div id="game-board"></div>
+    <p class="footer">Geser layar (HP) atau tekan panah (PC) untuk bermain</p>
   </div>
-  <div id="game-board"></div>
-  <p class="footer">Swipe (di HP) atau gunakan panah (di keyboard) untuk main</p>
+  
+  <div id="game-over-modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Game Over</h2>
+    <p>Skor Anda: <span id="final-score">0</span></p>
+    <button onclick="restartGame()">Main Lagi 🔁</button>
+  </div>
+</div>
   <script src="script.js"></script>
 </body>
 </html>
-
