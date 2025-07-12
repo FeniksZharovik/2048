@@ -1,9 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #faf8ef;
-  text-align: center;
   margin: 0;
+  padding: 0;
+  background-color: #faf8ef;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
   padding: 20px;
+  text-align: center;
 }
 
 h1 {
@@ -14,9 +24,13 @@ h1 {
 
 .score-box {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  background-color: #bbada0;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
   margin-bottom: 15px;
 }
 
@@ -32,25 +46,28 @@ button {
 
 #game-board {
   display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
   background-color: #bbada0;
-  padding: 10px;
-  margin: 0 auto;
+  padding: 5px;
   border-radius: 10px;
-  width: max-content;
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .tile {
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   background: #cdc1b4;
-  font-size: 28px;
-  line-height: 80px;
+  font-size: clamp(1rem, 4vw, 2rem);
+  line-height: 1;
   border-radius: 5px;
   font-weight: bold;
   color: #776e65;
-  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
 }
 
 .tile[data-value="2"]    { background: #eee4da; }
@@ -67,7 +84,58 @@ button {
 
 .footer {
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 0.9rem;
   color: #999;
 }
 
+@media (max-width: 400px) {
+  h1 {
+    font-size: 36px;
+  }
+
+  .score-box {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #8f7a66;
+}
+
+.modal-content button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #8f7a66;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.hidden {
+  display: none;
+}
